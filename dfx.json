@@ -1,0 +1,19 @@
+{
+  "canisters": {
+    "edge_matrix_requester_frontend": {
+      "frontend": {
+        "entrypoint": "src/edge_matrix_requester_frontend/public/index.html"
+      },
+      "source": ["dist/edge_matrix_requester_frontend/"],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

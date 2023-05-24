@@ -1,0 +1,11 @@
+[
+  {
+    "path": "The api path",
+    "method": "The api method 'POST or GET'",
+    "desc": "The api description",
+    "owner": "Your app name",
+    "contentType": "application/json",
+    "rawExample": "The api body example",
+    "rawDesc": "The api body example description"
+  }
+]
