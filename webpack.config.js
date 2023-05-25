@@ -73,7 +73,6 @@ module.exports = {
           transpileOnly: isDevelopment,
         },
       },
-      // { test: /\.css$/, use: [ 'style-loader', 'css-loader'] },
       { test: /\.css$/, use: ['vue-style-loader', 'css-loader'] },
       { test: /\.vue$/, use: ['vue-loader'] },
     ],
@@ -138,16 +137,3 @@ module.exports = {
     liveReload: true,
   },
 };
-
-/**
- * default-src 'self';
- * script-src 'self' 'unsafe-eval';
- * connect-src 'self' https://icp0.io https://*.icp0.io;img-src 'self' data:;
- * style-src * 'unsafe-inline';
- * style-src-elem * 'unsafe-inline';
- * font-src *;object-src 'none';
- * base-uri 'self';
- * frame-ancestors 'none';
- * form-action 'self';
- * upgrade-insecure-requests;
- */
