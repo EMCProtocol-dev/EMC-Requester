@@ -8,7 +8,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-const frontendDirectory = 'edge_matrix_requester_frontend';
+const frontendDirectory = 'frontend';
 
 module.exports = {
   target: 'web',

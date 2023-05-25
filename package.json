@@ -1,5 +1,5 @@
 {
-  "name": "edge_matrix_requester_frontend",
+  "name": "@emcicpmonorepo/requester",
   "version": "0.2.0",
   "description": "Internet Computer starter application",
   "keywords": [
@@ -11,6 +11,10 @@
     "EdgeMatrix",
     "API",
     "EdgeMatrixRequester"
+  ],
+  "files": [
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "webpack",

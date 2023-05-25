@@ -12,14 +12,14 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./src/edge_matrix_requester_frontend/src/*"]
+      "@/*": ["./src/frontend/src/*"]
     }
   },
   "include": [
-    "src/edge_matrix_requester_frontend/src/**/*.ts",
-    "src/edge_matrix_requester_frontend/src/**/*.d.ts",
-    "src/edge_matrix_requester_frontend/src/**/*.tsx",
-    "src/edge_matrix_requester_frontend/src/**/*.vue"
+    "./src/frontend/src/**/*.ts",
+    "./src/frontend/src/**/*.d.ts",
+    "./src/frontend/src/**/*.tsx",
+    "./src/frontend/src/**/*.vue"
   ],
   "exclude": ["node_modules"]
 }

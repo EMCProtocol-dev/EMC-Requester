@@ -1,10 +1,10 @@
 {
   "canisters": {
-    "edge_matrix_requester_frontend": {
+    "frontend": {
       "frontend": {
-        "entrypoint": "src/edge_matrix_requester_frontend/public/index.html"
+        "entrypoint": "src/frontend/public/index.html"
       },
-      "source": ["dist/edge_matrix_requester_frontend/"],
+      "source": ["dist/frontend/"],
       "type": "assets"
     }
   },
