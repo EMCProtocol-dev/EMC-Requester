@@ -151,7 +151,11 @@ export const useIDLStore = defineStore('idl', () => {
       });
       const responseDataFormatted = Utils.responseFormatted({ ...response.data });
       const { response: insideResponse } = responseDataFormatted.result || {};
-      const _idl = insideResponse || [];
+      let _idl = insideResponse || [];
+      //cover {idl:[]}
+      if (typeof _idl === 'object' && !Array.isArray(_idl)) {
+        _idl = _idl.idl || [];
+      }
       _idl.forEach((item: IDL) => {
         item._key = window.encodeURIComponent(window.btoa(item.path.replaceAll('/', '')).replaceAll('=', ''));
       });
