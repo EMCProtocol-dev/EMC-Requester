@@ -4,7 +4,7 @@
       <n-form-item path="network" label="Network" style="margin-bottom: 16px">
         <n-input v-model:value="formData.network" @keydown.enter.prevent />
       </n-form-item>
-      <n-form-item path="peerId" label="Peer ID" style="margin-bottom: 16px">
+      <n-form-item path="peerId" label="Node ID" style="margin-bottom: 16px">
         <n-input v-model:value="formData.peerId" @keydown.enter.prevent />
       </n-form-item>
 

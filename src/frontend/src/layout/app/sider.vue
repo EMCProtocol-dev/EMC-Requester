@@ -32,7 +32,7 @@
           <div class="global-info-item-content">{{ publicKey }}</div>
         </div>
         <div class="global-info-item">
-          <div class="global-info-item-label">Peer ID</div>
+          <div class="global-info-item-label">Node ID</div>
           <div class="global-info-item-content">{{ peerId }}</div>
         </div>
       </div>
