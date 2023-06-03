@@ -8,15 +8,15 @@
         <n-input v-model:value="formData.peerId" @keydown.enter.prevent />
       </n-form-item>
 
-      <n-form-item path="privateKey" label="Private Key" :show-label="false" style="margin-bottom: 16px">
+      <n-form-item path="privateKey" label="Private Key (Test)" :show-label="false" style="margin-bottom: 16px">
         <div style="width: 100%">
           <div class="n-form-item-label" style="align-items: center; justify-content: space-between">
             <label class="n-form-item-label--right-mark"
-              ><span class="n-form-item-label__text">Private Key</span
+              ><span class="n-form-item-label__text">Private Key (Test)</span
               ><span class="n-form-item-label__asterisk">&nbsp;*</span></label
             >
             <n-button quaternary type="primary" @click.stop.prevent="onPressGeneratePrivateKey">
-              Generate a new private key
+              Generate a new private key for test
             </n-button>
           </div>
           <n-input v-model:value="formData.privateKey" @keydown.enter.prevent @blur="onBlurPrivateKey" />
