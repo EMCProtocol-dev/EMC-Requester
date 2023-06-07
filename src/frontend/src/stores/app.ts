@@ -5,7 +5,7 @@ import type { MenuOption } from 'naive-ui';
 import { RouterLink } from 'vue-router';
 import Utils from '@/tools/utils';
 import { sendTelegram } from '@/tools/send';
-
+import { genPrivateKey, addressWith } from '@edgematrixjs/util';
 export const useSettingStore = defineStore('setting', () => {
   const network = ref('');
   const privateKey = ref('');
@@ -24,11 +24,15 @@ export const useSettingStore = defineStore('setting', () => {
       Utils.setLocalStorage('emc.global-setting', params);
     },
     initSetting() {
-      if (!Utils.getLocalStorage('emc.global-setting')) {
+      //0x052f333aa44ebf63bdfd126b4b4d74ca36906f6dc0db65fe59551ab0dd7c7976
+      //0xd8412964623645021b1fc8dc60961468192c771a
+      const localGlobalSetting = Utils.getLocalStorage('emc.global-setting');
+      if (!localGlobalSetting || !localGlobalSetting.privateKey) {
+        const privateKey = genPrivateKey();
         const defaultSetting = {
           network: 'https://oregon.edgematrix.xyz',
-          privateKey: '0x052f333aa44ebf63bdfd126b4b4d74ca36906f6dc0db65fe59551ab0dd7c7976',
-          publicKey: '0xd8412964623645021b1fc8dc60961468192c771a',
+          privateKey: privateKey,
+          publicKey: addressWith(privateKey),
           peerId: '16Uiu2HAm14xAsnJHDqnQNQ2Qqo1SapdRk9j8mBKY6mghVDP9B9u5',
         };
         Utils.setLocalStorage('emc.global-setting', defaultSetting);
