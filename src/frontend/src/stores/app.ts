@@ -111,7 +111,7 @@ export const useSiderStore = defineStore('sider', () => {
             }
           });
           _siderMenus.push({
-            label: () => renderMenuItemText('info', `Enter Point ${item.label}`),
+            label: () => renderMenuItemText('info', `Entry Point ${item.label}`),
             key: item.key,
             children: menuChildren,
           });
