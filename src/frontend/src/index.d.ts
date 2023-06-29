@@ -69,3 +69,7 @@ interface IDL {
   rawExample: srting;
   rawDesc: string;
 }
+interface HistoryNode {
+  label: string;
+  value: string;
+}

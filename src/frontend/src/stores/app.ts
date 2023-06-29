@@ -11,17 +11,34 @@ export const useSettingStore = defineStore('setting', () => {
   const privateKey = ref('');
   const publicKey = ref('');
   const peerId = ref();
+  const nodeList = ref<Array<HistoryNode>>([]);
   return {
     network,
     privateKey,
     publicKey,
     peerId,
+    nodeList,
     setSetting(params: GlobalSetting) {
       network.value = params.network;
       privateKey.value = params.privateKey;
       publicKey.value = params.publicKey;
       peerId.value = params.peerId;
       Utils.setLocalStorage('emc.global-setting', params);
+      this.addNodeIfNeed({ label: params.peerId, value: params.peerId });
+    },
+    addNodeIfNeed(item: HistoryNode) {
+      const index = nodeList.value.findIndex((i) => i.value === item.value);
+      if (index === -1) {
+        nodeList.value.splice(index, 1);
+      }
+      Utils.setLocalStorage('emc.global-node-list', nodeList.value);
+    },
+    removeNode(item: HistoryNode) {
+      const index = nodeList.value.findIndex((i) => i.value === item.value);
+      if (index > -1) {
+        nodeList.value.splice(index, 1);
+      }
+      Utils.setLocalStorage('emc.global-node-list', nodeList.value);
     },
     initSetting() {
       //0x052f333aa44ebf63bdfd126b4b4d74ca36906f6dc0db65fe59551ab0dd7c7976
@@ -37,14 +54,30 @@ export const useSettingStore = defineStore('setting', () => {
         };
         Utils.setLocalStorage('emc.global-setting', defaultSetting);
       }
-
       const globalSetting: GlobalSetting = Utils.getLocalStorage('emc.global-setting');
+
       if (typeof globalSetting === 'object' && globalSetting !== null) {
         network.value = globalSetting.network;
         privateKey.value = globalSetting.privateKey;
         publicKey.value = globalSetting.publicKey;
         peerId.value = globalSetting.peerId;
       }
+
+      const localNodeList = Utils.getLocalStorage('emc.global-node-list');
+
+      if (!Array.isArray(localNodeList) || localNodeList.length === 0) {
+        const defaultNodeList = [
+          {
+            value: '16Uiu2HAm14xAsnJHDqnQNQ2Qqo1SapdRk9j8mBKY6mghVDP9B9u5',
+            label: '16Uiu2HAm14xAsnJHDqnQNQ2Qqo1SapdRk9j8mBKY6mghVDP9B9u5',
+          },
+        ];
+        Utils.setLocalStorage('emc.global-node-list', defaultNodeList);
+      }
+
+      const globalNodeList = Utils.getLocalStorage('emc.global-node-list');
+
+      nodeList.value = globalNodeList;
 
       return globalSetting;
     },

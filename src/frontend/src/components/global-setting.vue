@@ -1,11 +1,21 @@
 <template>
-  <n-card style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
+  <n-card title="Setting" style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
     <n-form ref="formRef" :model="formData" :rules="formRule">
       <n-form-item path="network" label="Network" style="margin-bottom: 16px">
         <n-input v-model:value="formData.network" @keydown.enter.prevent />
       </n-form-item>
-      <n-form-item path="peerId" label="Node ID" style="margin-bottom: 16px">
-        <n-input v-model:value="formData.peerId" @keydown.enter.prevent />
+
+      <n-form-item path="peerId" label="Node ID" :show-label="false" style="margin-bottom: 16px">
+        <div style="width: 100%">
+          <div class="n-form-item-label" style="align-items: center; justify-content: space-between">
+            <label class="n-form-item-label--right-mark"
+              ><span class="n-form-item-label__text">Node ID</span
+              ><span class="n-form-item-label__asterisk">&nbsp;*</span></label
+            >
+            <n-button quaternary type="primary" @click.stop.prevent="onPressNodes"> From history </n-button>
+          </div>
+          <n-input v-model:value="formData.peerId" @keydown.enter.prevent />
+        </div>
       </n-form-item>
 
       <n-form-item path="privateKey" label="Private Key (Test)" :show-label="false" style="margin-bottom: 16px">
@@ -32,27 +42,31 @@
         <n-button class="setting-footer-btn" type="primary" @click="onPressSubmit">Submit</n-button>
       </div>
     </template>
+    <n-modal v-model:show="isVisibleNodeList" :mask-closable="false">
+      <HistoryNodes @selected="onNodeListSelected" @cancel="onNodeListCancel" />
+    </n-modal>
   </n-card>
 </template>
 <script lang="ts">
 import { genPrivateKey, addressWith } from '@edgematrixjs/util';
-import { ref, defineComponent, defineProps, h, computed, Component } from 'vue';
+import { ref, defineComponent, defineProps, h, computed } from 'vue';
 import {
   NForm,
   NFormItem,
   NButton,
   NInput,
+  NSelect,
   NMenu,
   NCard,
   NTag,
   NModal,
   FormInst,
   FormRules,
-  FormItemRule,
   useMessage,
 } from 'naive-ui';
+import HistoryNodes from '@/components/history-nodes.vue';
 export default defineComponent({
-  components: { NForm, NFormItem, NButton, NMenu, NInput, NCard, NTag, NModal },
+  components: { NForm, NFormItem, NButton, NMenu, NInput, NSelect, NCard, NTag, NModal, HistoryNodes },
   props: {
     network: { type: String, default: '' },
     privateKey: { type: String, default: '' },
@@ -68,6 +82,7 @@ export default defineComponent({
       publicKey: props.publicKey,
       peerId: props.peerId,
     });
+
     const formRule: FormRules = {
       network: [
         {
@@ -98,8 +113,7 @@ export default defineComponent({
         },
       ],
     };
-    const message = useMessage();
-    const exeuting = ref(false);
+
     const publicKeyWith = (privateKey: string): string => {
       try {
         return addressWith(privateKey);
@@ -107,10 +121,14 @@ export default defineComponent({
         return '';
       }
     };
+
+    const isVisibleNodeList = ref(false);
+
     return {
       formRef,
       formData,
       formRule,
+      isVisibleNodeList,
       onBlurPrivateKey() {
         console.info(formData.value.privateKey);
         if (formData.value.privateKey) {
@@ -118,6 +136,16 @@ export default defineComponent({
         } else {
           formData.value.publicKey = '';
         }
+      },
+      onPressNodes() {
+        isVisibleNodeList.value = true;
+      },
+      onNodeListSelected(item: HistoryNode) {
+        formData.value.peerId = item.value;
+        isVisibleNodeList.value = false;
+      },
+      onNodeListCancel() {
+        isVisibleNodeList.value = false;
       },
       onPressCancel() {
         ctx.emit('cancel');
