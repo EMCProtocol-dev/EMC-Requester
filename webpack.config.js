@@ -97,19 +97,11 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: `src/${frontendDirectory}/public/.ic-assets.json*`,
-          to: '.ic-assets.json5',
+          from: `src/${frontendDirectory}/public`,
           noErrorOnMissing: true,
-        },
-        {
-          from: `src/${frontendDirectory}/assets/favicon.ico`,
-          to: '[name][ext]',
-          noErrorOnMissing: true,
-        },
-        {
-          from: `src/${frontendDirectory}/assets/idl.json`,
-          to: '[name][ext]',
-          noErrorOnMissing: true,
+          filter: (resourcePath) => {
+            return resourcePath.indexOf('index.html') === -1;
+          },
         },
       ],
     }),

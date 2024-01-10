@@ -29,7 +29,7 @@ export const useSettingStore = defineStore('setting', () => {
     addNodeIfNeed(item: HistoryNode) {
       const index = nodeList.value.findIndex((i) => i.value === item.value);
       if (index === -1) {
-        nodeList.value.splice(index, 1);
+        nodeList.value.push(item);
       }
       Utils.setLocalStorage('emc.global-node-list', nodeList.value);
     },
@@ -190,7 +190,7 @@ export const useIDLStore = defineStore('idl', () => {
       const { response: insideResponse } = responseDataFormatted.result || {};
       let _idl = insideResponse || [];
       //cover {idl:[]}
-      if (typeof _idl === 'object' && !Array.isArray(_idl)) {
+      if (!Array.isArray(_idl)) {
         _idl = _idl.idl || [];
       }
       _idl.forEach((item: IDL) => {

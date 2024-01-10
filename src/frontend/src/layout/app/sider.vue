@@ -24,16 +24,16 @@
           <div class="global-info-item-content">{{ network }}</div>
         </div>
         <div class="global-info-item">
+          <div class="global-info-item-label">Node ID</div>
+          <div class="global-info-item-content">{{ peerId }}</div>
+        </div>
+        <div class="global-info-item">
           <div class="global-info-item-label">Private Key (Test)</div>
-          <div class="global-info-item-content">{{ privateKey }}</div>
+          <div class="global-info-item-content">***</div>
         </div>
         <div class="global-info-item">
           <div class="global-info-item-label">Public Key (Address)</div>
           <div class="global-info-item-content">{{ publicKey }}</div>
-        </div>
-        <div class="global-info-item">
-          <div class="global-info-item-label">Node ID</div>
-          <div class="global-info-item-content">{{ peerId }}</div>
         </div>
       </div>
     </n-card>

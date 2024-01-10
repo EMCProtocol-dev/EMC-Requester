@@ -27,7 +27,7 @@
   "dependencies": {
     "@dfinity/agent": "^0.15.6",
     "@dfinity/candid": "^0.15.6",
-    "@dfinity/principal": "^0.15.6",
+    "@dfinity/principal": "^0.15.7",
     "@edgematrixjs/tx": "^1.0.0",
     "@edgematrixjs/util": "^1.0.0",
     "@vicons/ionicons5": "^0.12.0",

@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+    "noImplicitAny": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "paths": {

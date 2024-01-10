@@ -3,7 +3,7 @@ import { genPrivateKey, addressWith, hexToBuffer, addHexPrefix } from '@edgematr
 import { Http } from '@/tools/http';
 
 const chainId = 2;
-const debug = false;
+const debug = true;
 
 export const sendTelegram = async ({ network, peerId, privateKey, endpoint, input }: TelegramParameters) => {
   const http = Http.getInstance();
