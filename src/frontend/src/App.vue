@@ -19,23 +19,30 @@
 </template>
 
 <script>
-import { ref, onMounted, defineComponent } from 'vue';
-import { useLoadingBar, NLayout, NLayoutSider, NLayoutContent, NSpin } from 'naive-ui';
-import { loadingBarApiRef } from './routes/index';
-import { useIsMobile } from './tools/composables';
-import Sider from '@/layout/app/sider';
-import { useSettingStore, useSiderStore, useIDLStore } from './stores/app';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, defineComponent } from "vue";
+import {
+  useLoadingBar,
+  NLayout,
+  NLayoutSider,
+  NLayoutContent,
+  NSpin,
+} from "naive-ui";
+import { loadingBarApiRef } from "./routes/index";
+import { useIsMobile } from "./tools/composables";
+import Sider from "@/layout/app/sider";
+import { useSettingStore, useSiderStore, useIDLStore } from "./stores/app";
+import { useRouter, useRoute } from "vue-router";
 export default defineComponent({
-  name: 'App',
+  name: "App",
   components: { NLayout, NLayoutSider, NLayoutContent, Sider, NSpin },
   setup() {
     const ready = ref(false);
     const loadingBar = useLoadingBar();
-    //is mobild
+    //is mobile
     const isMobileRef = useIsMobile();
 
     const router = useRouter();
+    const route = useRoute();
 
     const settintStore = useSettingStore();
     const idlStore = useIDLStore();
@@ -46,8 +53,11 @@ export default defineComponent({
       if (setting) {
         const idl = await idlStore.initIDL(setting);
         const menus = siderStore.initMenus(idl);
+        if (route.query.nodeId) {
+          settintStore.setSetting({ ...setting, peerId: route.query.nodeId });
+        }
       } else {
-        router.replace({ name: 'home' });
+        router.replace({ name: "home" });
       }
       loadingBarApiRef.value = loadingBar;
       loadingBar.finish();
