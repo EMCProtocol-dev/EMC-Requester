@@ -24,6 +24,11 @@ export const routes = [
     component: () => import('@/pages/idl/idl.vue'),
   },
   {
+    name: 'legacy-api',
+    path: '/legacy-api/:key',
+    component: () => import('@/pages/legacy-api/legacy-api.vue'),
+  },
+  {
     name: 'api',
     path: '/api/:key',
     component: () => import('@/pages/api/api.vue'),

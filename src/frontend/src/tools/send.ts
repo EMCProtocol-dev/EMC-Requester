@@ -7,15 +7,16 @@ const debug = true;
 
 export const sendTelegram = async ({ network, peerId, privateKey, endpoint, input }: TelegramParameters) => {
   const http = Http.getInstance();
-  const address = addressWith(privateKey);
-  const nonceResp = await http.postJSON({
-    url: network,
-    data: { jsonrpc: '2.0', id: 1, method: 'edge_getTelegramCount', params: [address] },
-  });
-  const nonce = nonceResp.data?.result;
-  if (!nonce) {
-    return { _result: 1, _desc: 'nonce is none' };
-  }
+  // const address = addressWith(privateKey);
+  // const nonceResp = await http.postJSON({
+  //   url: network,
+  //   data: { jsonrpc: '2.0', id: 1, method: 'edge_getTelegramCount', params: [address] },
+  // });
+
+  // const nonce = nonceResp.data?.result;
+  // if (!nonce) {
+  //   return { _result: 1, _desc: 'nonce is none' };
+  // }
   const preData = {
     peerId: peerId,
     endpoint: endpoint,
@@ -27,7 +28,7 @@ export const sendTelegram = async ({ network, peerId, privateKey, endpoint, inpu
   }
 
   const transaction = new LegacyTransaction({
-    nonce: nonce,
+    nonce: '0x0', //nonce
     gasPrice: '0x0',
     gasLimit: '0x0',
     to: '0x0000000000000000000000000000000000003001',
@@ -45,5 +46,6 @@ export const sendTelegram = async ({ network, peerId, privateKey, endpoint, inpu
     url: network,
     data: { jsonrpc: '2.0', id: 1, method: 'edge_sendRawTelegram', params: [hexSerialized] },
   });
-  return { _result: 0, response: teleResp };
+
+  return { _result: 0, _desc: '', response: teleResp || {} };
 };

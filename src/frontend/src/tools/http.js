@@ -1,4 +1,4 @@
-import { AxiosResponse, AxiosRequestConfig, Axios } from 'axios';
+import { Axios } from 'axios';
 
 const HTTP_METHOD = {
   GET: 'GET',
@@ -24,7 +24,9 @@ class Http {
     this.client = new Axios(opt);
     this.client?.interceptors.response.use(
       (response) => response,
-      (error) => error.response || {}
+      (error) => {
+        return error.response || {};
+      }
     );
   }
 
@@ -82,10 +84,13 @@ class Http {
 
   _handler() {
     return (response) => {
+      if (typeof response.status === 'undefined') {
+        return response;
+      }
       if (response.status === 0) {
         return response;
       }
-      const contentType = response.headers['content-type'];
+      const contentType = response.headers ? response.headers['content-type'] : '';
       if (contentType === 'application/json' && typeof response.data === 'string') {
         try {
           response.data = JSON.parse(response.data);

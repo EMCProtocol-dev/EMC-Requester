@@ -31,6 +31,10 @@ body {
   margin: 0;
 }
 
+.n-notification-main__content {
+  margin-top: 0 !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

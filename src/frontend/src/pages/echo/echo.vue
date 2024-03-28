@@ -30,9 +30,7 @@
             </n-table>
           </div>
           <div class="part">
-            <n-button type="primary" size="large" :block="true" :loading="exeuting" @click="onPressExecute">
-              Execute
-            </n-button>
+            <n-button type="primary" size="large" :block="true" :loading="exeuting" @click="onPressExecute"> Execute </n-button>
           </div>
         </n-card>
 
@@ -73,20 +71,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
-import {
-  NDescriptions,
-  NDescriptionsItem,
-  NTable,
-  NTag,
-  NInput,
-  NButton,
-  NCard,
-  NCode,
-  NTabs,
-  NTabPane,
-  NCollapse,
-  NCollapseItem,
-} from 'naive-ui';
+import { NDescriptions, NDescriptionsItem, NTable, NTag, NInput, NButton, NCard, NCode, NTabs, NTabPane, NCollapse, NCollapseItem } from 'naive-ui';
 import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json';
 import jsonFormat from 'json-format';
@@ -142,7 +127,11 @@ export default defineComponent({
       responseData.value = '';
       responseDataFormatted.value = '';
       exeuting.value = true;
-      const { _result, _desc, response } = await sendTelegram({
+      const {
+        _result,
+        _desc,
+        response = {},
+      } = await sendTelegram({
         network,
         peerId,
         privateKey,
@@ -150,15 +139,15 @@ export default defineComponent({
         input,
       });
       exeuting.value = false;
-
+      const responseConfig = response.config || { url: '-', method: '-' };
       responseGeneral.value = {
-        requestUrl: response.config.url,
-        requestMethod: response.config.method.toUpperCase(),
+        requestUrl: responseConfig.url,
+        requestMethod: responseConfig.method.toUpperCase(),
         statusCode: response.status,
       };
       const teleRespData = response.data;
       const teleRespDataFormatted = Utils.responseFormatted({ ...response.data });
-      responseData.value = jsonFormat(teleRespData);
+      responseData.value = typeof teleRespData === 'string' ? jsonFormat(teleRespData) : 'Response is not a json';;
       responseDataFormatted.value = jsonFormat(teleRespDataFormatted);
     };
     onMounted(() => {

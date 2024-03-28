@@ -14,7 +14,7 @@
                 <h4>{{ idlMethod }}</h4>
               </n-tag>
               <n-tag :bordered="false" type="success"
-                ><h4>Entry Point API - {{ idlPath }}</h4></n-tag
+                ><h4>Entry Point Legacy API - {{ idlPath }}</h4></n-tag
               >
             </template>
             <div class="part">
@@ -36,7 +36,12 @@
                       </td>
                       <td>
                         <span style="font-weight: bold">Enter your inside api path</span>
-                        <n-input class="fieldinput" type="textarea" placeholder="Example:/api/img/transfer" v-model:value="inputPath" />
+                        <n-input
+                          class="fieldinput"
+                          type="textarea"
+                          placeholder="Example:/api/img/transfer"
+                          v-model:value="inputPath"
+                        />
                       </td>
                     </tr>
                   </template>
@@ -47,16 +52,12 @@
                       </td>
                       <td>
                         <span style="font-weight: bold">Enter your inside api method</span>
-                        <n-input class="fieldinput" type="textarea" placeholder="POST / GET" v-model:value="inputMethod" />
-                      </td>
-                    </tr>
-                    <tr style="vertical-align: top">
-                      <td>
-                        <span style="font-weight: bold">port</span>
-                      </td>
-                      <td>
-                        <span style="font-weight: bold">Enter your inside api port</span>
-                        <n-input class="fieldinput" type="textarea" placeholder="POST / GET" v-model:value="inputPort" />
+                        <n-input
+                          class="fieldinput"
+                          type="textarea"
+                          placeholder="POST / GET"
+                          v-model:value="inputMethod"
+                        />
                       </td>
                     </tr>
                   </template>
@@ -73,7 +74,9 @@
               </n-table>
             </div>
             <div class="part">
-              <n-button type="primary" size="large" :block="true" :loading="exeuting" @click="onPressExecute"> Execute </n-button>
+              <n-button type="primary" size="large" :block="true" :loading="exeuting" @click="onPressExecute">
+                Execute
+              </n-button>
             </div>
           </n-card>
           <n-card>
@@ -88,18 +91,6 @@
                   <div class="response-general-info">
                     <span class="response-general-info-label">Request Method</span>
                     <n-tag :bordered="false"> {{ responseGeneral.requestMethod }} </n-tag>
-                  </div>
-                  <div class="response-general-info">
-                    <span class="response-general-info-label">Geteway URL</span>
-                    <n-tag :bordered="false"> {{ responseGeneral.gatewayUrl }} </n-tag>
-                  </div>
-                  <div class="response-general-info">
-                    <span class="response-general-info-label">App URL</span>
-                    <n-tag :bordered="false"> {{ responseGeneral.apiUrl }} </n-tag>
-                  </div>
-                  <div class="response-general-info">
-                    <span class="response-general-info-label">App Port</span>
-                    <n-tag :bordered="false"> {{ responseGeneral.apiPort }} </n-tag>
                   </div>
                   <div class="response-general-info">
                     <span class="response-general-info-label">Status Code</span>
@@ -140,13 +131,11 @@ import {
   NTabPane,
   NCollapse,
   NCollapseItem,
-  useNotification,
 } from 'naive-ui';
 import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json';
 import jsonFormat from 'json-format';
 import Utils from '@/tools/utils';
-import { Http } from '@/tools/http';
 import { useRoute } from 'vue-router';
 import FormatCode from '@/components/format-code.vue';
 import Code from '@/components/code.vue';
@@ -175,7 +164,7 @@ export default defineComponent({
   setup() {
     hljs.registerLanguage('json', json);
     const settingStore = useSettingStore();
-    const notification = useNotification();
+
     const error = ref(-1);
     const errorText = ref('');
 
@@ -183,15 +172,13 @@ export default defineComponent({
 
     const inputPath = ref('');
     const inputMethod = ref('');
-    const inputPort = ref('');
 
     const idlPath = ref('');
     const idlMethod = ref('METHOD');
-    const idlPort = ref<number | string>(0);
     const idlBodyRawDesc = ref('');
     const idlBodyRawInput = ref('');
 
-    const responseGeneral = ref<ResponseGeneral>({ requestUrl: '', requestMethod: '', gatewayUrl: '', apiUrl: '', apiPort: '', statusCode: 0 });
+    const responseGeneral = ref<ResponseGeneral>({ requestUrl: '', requestMethod: '', statusCode: 0 });
     const responseData = ref('');
     const responseDataFormatted = ref('');
     const route = useRoute();
@@ -208,9 +195,6 @@ export default defineComponent({
         responseGeneral.value = {
           requestUrl: '',
           requestMethod: '',
-          gatewayUrl: '',
-          apiUrl: '',
-          apiPort: '',
           statusCode: 0,
         };
         responseData.value = '';
@@ -221,14 +205,12 @@ export default defineComponent({
         if (idl) {
           idlPath.value = idl.path;
           idlMethod.value = idl.method;
-          idlPort.value = idl.port;
           idlBodyRawDesc.value = idl.rawDesc;
           idlBodyRawInput.value = idl.rawExample;
           error.value = 0;
         } else {
           idlPath.value = '';
           idlMethod.value = '';
-          idlPort.value = '';
           idlBodyRawDesc.value = '';
           idlBodyRawInput.value = '';
           error.value = 404;
@@ -247,7 +229,6 @@ export default defineComponent({
       exeuting,
       inputPath,
       inputMethod,
-      inputPort,
       idlPath,
       idlMethod,
       idlBodyRawDesc,
@@ -261,40 +242,37 @@ export default defineComponent({
         const privateKey = settingStore.privateKey;
         const path = idlPath.value === '*' ? inputPath.value : idlPath.value;
         const method = idlMethod.value === '*' ? inputMethod.value : idlMethod.value;
-        const port = idlPort.value === '*' ? inputPort.value : idlPort.value;
         const bodyRaw = idlBodyRawInput.value;
-        const apiBody = bodyRaw ? Utils.parseJSON(bodyRaw) : {};
-        const requireProperties = { network, peerId, privateKey, path, port, apiBody };
-        const errorProperties: string[] = [];
-        Object.entries(requireProperties).map(([k, v]) => {
-          if (!v) {
-            errorProperties.push(k);
-          }
-        });
 
-        //error
-        if (errorProperties.length > 0) {
-          return notification.error({ title: 'ERROR', content: `The "${errorProperties.join(',')}" is empty.` });
+        if (!network) {
+          //error
         }
-        const gatewayUrl = '/hubapi/v1/executeTask';
+        if (!peerId) {
+          //error
+        }
+        if (!privateKey) {
+          //error
+        }
+        if (!path) {
+          //error
+        }
+        if (!method) {
+          //error
+        }
+
         const input: any = {
-          path: gatewayUrl,
-          method: 'POST',
+          path,
+          method,
           headers: [],
-          port,
-          body: { apiMethod: method, apiPath: path, port: port, ...apiBody },
+          body: Utils.parseJSON(bodyRaw) || bodyRaw || '',
         };
 
-        responseGeneral.value = { requestUrl: '', requestMethod: '', gatewayUrl: '', apiUrl: '', apiPort: '', statusCode: 0 };
+        responseGeneral.value = { requestUrl: '', requestMethod: '', statusCode: 0 };
         responseData.value = '';
         responseDataFormatted.value = '';
 
         exeuting.value = true;
-        const {
-          _result,
-          _desc,
-          response = {},
-        } = await sendTelegram({
+        const { _result, _desc, response } = await sendTelegram({
           network,
           peerId,
           privateKey,
@@ -302,18 +280,15 @@ export default defineComponent({
           input: input,
         });
         exeuting.value = false;
-        const responseConfig = response.config || { url: '-', method: '-' };
+
         responseGeneral.value = {
-          requestUrl: responseConfig.url,
-          requestMethod: responseConfig.method.toUpperCase(),
-          gatewayUrl: gatewayUrl,
-          apiUrl: path,
-          apiPort: port,
+          requestUrl: response.config.url,
+          requestMethod: response.config.method.toUpperCase(),
           statusCode: response.status,
         };
         const teleRespData = response.data;
         const teleRespDataFormatted = Utils.responseFormatted({ ...response.data });
-        responseData.value = typeof teleRespData === 'string' ? jsonFormat(teleRespData) : 'Response is not a json';
+        responseData.value = jsonFormat(teleRespData);
         responseDataFormatted.value = jsonFormat(teleRespDataFormatted);
       },
     };

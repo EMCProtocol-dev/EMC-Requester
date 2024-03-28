@@ -19,8 +19,9 @@ declare module '@/tools/http' {
     data: any;
   }
   declare class Http {
-    postJSON(config: HttpConfig): Promise<any>;
     static getInstance(): Http;
+    postJSON(config: HttpConfig): Promise<any>;
+    get(config: HttpConfig): Promise<any>;
   }
   export { Http };
 }
@@ -54,6 +55,9 @@ interface ResponseGeneral {
   requestUrl: string;
   requestMethod: string;
   statusCode: number;
+  gatewayUrl?: string;
+  apiUrl?: string;
+  apiPort?: number | string;
 }
 
 type IDLMethod = 'POST' | 'GET';
@@ -63,6 +67,7 @@ interface IDL {
   _key?: string;
   path: string;
   method: IDLMethod;
+  port: number | string; //port number or '*'
   desc: string;
   owner: string;
   contentType: IDLContentType; //"application/json",

@@ -1,11 +1,12 @@
 import { ref, h } from 'vue';
 import { defineStore } from 'pinia';
-import { NTag } from 'naive-ui';
+import { NTag, useNotification } from 'naive-ui';
 import type { MenuOption } from 'naive-ui';
 import { RouterLink } from 'vue-router';
 import Utils from '@/tools/utils';
 import { sendTelegram } from '@/tools/send';
 import { genPrivateKey, addressWith } from '@edgematrixjs/util';
+import { Http } from '@/tools/http';
 export const useSettingStore = defineStore('setting', () => {
   const network = ref('');
   const privateKey = ref('');
@@ -123,14 +124,14 @@ export const useSiderStore = defineStore('sider', () => {
         { label: 'Echo', key: '/echo', desc: 'test something', to: { name: 'echo' } },
         { label: 'IDL', key: '/idl', desc: 'query api list', to: { name: 'idl' } },
         {
-          label: 'APIs',
-          key: 'api',
-          desc: 'api list',
-          children: apiMenus,
+          label: 'Legacy-APIs',
+          key: 'legacy-api',
+          desc: 'legacy api list',
+          children: [{ label: '*', key: '/legacy-api/*', desc: '', to: { name: 'legacy-api', params: { key: '*' } } }],
         },
+        { label: 'APIs', key: 'api', desc: 'api list', children: apiMenus },
       ];
       menus.value = _menus;
-
       const _siderMenus: MenuOption[] = [];
       _menus.forEach((item: any, index: number) => {
         if (typeof item.to === 'object') {
@@ -165,6 +166,50 @@ export const useSiderStore = defineStore('sider', () => {
 export const useIDLStore = defineStore('idl', () => {
   const idl = ref<Array<IDL>>([]);
   const settingStore = useSettingStore();
+  const notification = useNotification();
+
+  async function queryPortsWithPeerId(peerId: string) {
+    const http = Http.getInstance();
+    const response = await http.get({
+      url: 'https://cloud.emchub.ai/emc-boot/node/emcNode/queryNodeByName',
+      data: { name: peerId },
+    });
+    const result = Utils.parseJSON(response?.data?.result || '{}') || {};
+    if (!result) {
+      notification.error({ title: 'ERROR', content: 'The "ports" is empty.' });
+    }
+    if (!Array.isArray(result.detail)) {
+      return { map: {}, list: [] };
+    }
+    const list = result.detail as any[];
+    const map: { [appOrigin: string]: any } = {};
+    list.forEach((item) => {
+      map[item.appOrigin] = item;
+    });
+    return { map, list };
+  }
+
+  // query interface list from cloud
+  async function queryIDLFromCloud(appOrigin: string) {
+    if (!appOrigin) {
+      notification.error({ title: 'ERROR', content: 'Query "IDL" failed.\nBecause "appOrigin" is empty.' });
+      return [];
+    }
+    const http = Http.getInstance();
+    const response = await http.get({
+      url: 'https://cloud.emchub.ai/emcboot/model/emcAiModel/queryIdlByAppOrigin',
+      data: { appOrigin: appOrigin },
+    });
+    if (!response?.data?.result) {
+      notification.error({ title: 'ERROR', content: 'The "IDL" is empty.' });
+    }
+
+    const result = Utils.parseJSON(response?.data?.result || '[]') || [];
+    if (!Array.isArray(result)) {
+      return [];
+    }
+    return result as any[];
+  }
   return {
     idl,
     async initIDL(params = { network: '', peerId: '', privateKey: '' }) {
@@ -180,7 +225,63 @@ export const useIDLStore = defineStore('idl', () => {
       if (!privateKey) {
         //error
       }
-      const { _result, _desc, response } = await sendTelegram({
+
+      const { map: portMap, list: portList } = await queryPortsWithPeerId(peerId);
+
+      //call /info
+      const { _result, _desc, response = {} } = await sendTelegram({ network, peerId, privateKey, endpoint: '/info' });
+      const teleRespDataFormatted = Utils.responseFormatted(response?.data || {});
+      const tag = teleRespDataFormatted?.result?.response?.tag || '';
+      const gpuInfo = Utils.parseJSON(teleRespDataFormatted?.result?.response?.gpu_info) || { gpus: 0, graphics_card: [] };
+      const appInfo = Utils.parseJSON(tag) || { appOrigin: tag, gpuInfo: gpuInfo.graphics_card };
+      const appOrigins = appInfo.appOrigin?.split(',') || [];
+      const promises = appOrigins.map((appOrigin: string) => queryIDLFromCloud(appOrigin));
+      const idlSection = await Promise.all(promises);
+
+      let _idl: any[] = [
+        {
+          _key: '*',
+          path: '*',
+          method: '*',
+          port: '*',
+          desc: 'Custom Api',
+          owner: '*',
+          contentType: 'application/json',
+          rawExample: '',
+          rawDesc: 'Enter you inside api body anything',
+        },
+      ];
+      idlSection.forEach((idl, index) => {
+        const appOrigin = appOrigins[index];
+        idl.forEach((item: IDL) => {
+          item._key = window.encodeURIComponent(window.btoa(item.path.replaceAll('/', '')).replaceAll('=', ''));
+          item.port = portMap[appOrigin].port || 0;
+          _idl.push(item);
+        });
+      });
+
+      idl.value = _idl;
+      return _idl;
+    },
+    //backup
+    async initIDL2(params = { network: '', peerId: '', privateKey: '' }) {
+      const network = params.network || settingStore.network;
+      const peerId = params.peerId || settingStore.peerId;
+      const privateKey = params.privateKey || settingStore.privateKey;
+      if (!network) {
+        //error
+      }
+      if (!peerId) {
+        //error
+      }
+      if (!privateKey) {
+        //error
+      }
+      const {
+        _result,
+        _desc,
+        response = {},
+      } = await sendTelegram({
         network,
         peerId,
         privateKey,
